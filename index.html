@@ -21,10 +21,6 @@
                 </div>
                 <img src="img/Krusty_Le_Clown.webp" id="img" alt="Workplace" usemap="#workmap" width="400" height="500">
                 <map name="workmap" id="mapArea">
-                    <area shape="rect" title="Yellow" "https://mozilla.org" coords="34,44,270,350" alt="Computer"
-                        href="computer.htm">
-                    <area shape="rect" title="Yellow" coords="290,172,333,250" alt="Phone" href="phone.htm">
-                    <area shape="circle" title="Yellow" coords="337,300,44" alt="Cup of coffee" href="coffee.htm">
                 </map>
             </div>
             <div class="form col-6">
@@ -133,7 +129,7 @@
                 </div>
             </div>
             <div class="col-2">
-                <button type="submit" class="btn btn-primary" name="login-form-submit"
+                <button type="submit" id="afficher" class="btn btn-primary" name="login-form-submit"
                     onclick="viewPos(event)">Afficher</button>
             </div>
             <!-- </div> -->
@@ -236,63 +232,130 @@
         e.preventDefault();
         var myForm = document.getElementById('map');
         formData = new FormData(myForm);
+        creer = true;
         if (isNaN(formData.get('id'))) {
             alert("id est faux !!");
-            return;
+            creer = false;
         }
         map.setTblObjetAreaCarre().forEach(element => {
             if (element.id == formData.get('id')) {
                 alert("id déjà utilisé !!");
-                return;
+                creer = false;
             }
         });
-        var point1 = new Point(formData.get('id'), formData.get('id'));
-        var point2 = new Point(30, 30);
-        tblPoint = [
-            point1,
-            point2
-        ];
-        var areaCarre = new AreaCarre(formData.get('id'), formData.get('type'), tblPoint);
-        map.addElementArrayAreaCarre(areaCarre);
-        var parsed = parseInt(document.getElementById("id").value);
-        // document.getElementById("id").value = parsed + 1;
-        printPos(areaCarre);
-        console.log(map.setTblObjetAreaCarre());
-        return;
-    }
-    function updatePos(areaCarre, tblPoint) {
+        if (creer) {
 
+            var point1 = new Point(formData.get('id'), formData.get('id'));
+            var point2 = new Point(50, 50);
+            tblPoint = [
+                point1,
+                point2
+            ];
+            var areaCarre = new AreaCarre(formData.get('id'), formData.get('type'), tblPoint);
+            map.addElementArrayAreaCarre(areaCarre);
+            var parsed = parseInt(document.getElementById("id").value);
+            // document.getElementById("id").value = parsed + 1;
+            printPos(areaCarre);
+            returnPointForm(areaCarre);
+            console.log(map.setTblObjetAreaCarre());
+
+        }
     }
+
     function printPos(areaCarre) {
+        if (document.getElementById(areaCarre.getId()) != null) {
+            document.getElementById(areaCarre.getId()).remove();
+        }
         var element = document.getElementById("mapArea").innerHTML;
-        document.getElementById("mapArea").innerHTML = "<area shape='rect' title='Yellow' 'https://mozilla.org' coords='" + areaCarre.getCoordonnees()[0].getX() + "," + areaCarre.getCoordonnees()[0].getY() + "," + areaCarre.getCoordonnees()[1].getX() + "," + areaCarre.getCoordonnees()[1].getY() + "' alt='Computer' href='computer.htm'>" + element;
+        document.getElementById("mapArea").innerHTML = "<area shape='rect' id="
+            + areaCarre.getId() + " title='Yellow' 'https://mozilla.org' coords='"
+            + areaCarre.getCoordonnees()[0].getX() + ","
+            + areaCarre.getCoordonnees()[0].getY() + ","
+            + (parseInt(areaCarre.getCoordonnees()[1].getX())) + ","
+            + (parseInt(areaCarre.getCoordonnees()[1].getY())) + "' alt='Computer' href='computer.htm'>" + element;
     }
 
     function update(e) {
         e.preventDefault();
-        var myForm = document.getElementById('map');
-
-        updatePos(areaCarre, tblPoint);
+        areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+        areaCarre.getCoordonnees()[0].setX(document.getElementById("x1").value);
+        areaCarre.getCoordonnees()[0].setY(document.getElementById("y1").value);
+        areaCarre.getCoordonnees()[1].setX(document.getElementById("x2").value);
+        areaCarre.getCoordonnees()[1].setY(document.getElementById("y2").value);
+        printPos(areaCarre);
+        if (document.getElementById("afficher").innerHTML == "Cacher") {
+            document.getElementById("afficher").innerHTML = "Afficher";
+        } else {
+            document.getElementById("afficher").innerHTML = "Cacher";
+        }
+        viewPos(e);
     }
 
     function viewPos(e) {
         e.preventDefault();
         document.getElementById("view").innerHTML = "";
-        var total = [];
-        map.setTblObjetAreaCarre().forEach(element => {
-            var cor = [];
-            cor.push(element.getId());
-            element.getCoordonnees().forEach(elementNext => {
-                cor.push(elementNext.getX());
-                cor.push(elementNext.getY());
+        if (document.getElementById("afficher").innerHTML == "Cacher") {
+            document.getElementById("afficher").innerHTML = "Afficher";
+        } else {
+            document.getElementById("afficher").innerHTML = "Cacher";
+            var total = [];
+            map.setTblObjetAreaCarre().forEach(element => {
+                var cor = [];
+                cor.push(element.getId());
+                element.getCoordonnees().forEach(elementNext => {
+                    cor.push(elementNext.getX());
+                    cor.push(elementNext.getY());
+                });
+                total.push(cor);
             });
-            total.push(cor);
-        });
-        console.log(total);
-        total.forEach(element => {
-            var c = document.getElementById("view").innerHTML;
-            document.getElementById("view").innerHTML = "<div id='view" + element[0] + "' style='border: solid; top: "+element[1]+"px; left: "+element[2]+"px; width: "+element[3]+"px; height: "+element[4]+"px; position: absolute;'></div>" + c;
-        });
+            console.log(total);
+            total.forEach(element => {
+                var c = document.getElementById("view").innerHTML;
+                var x1 = parseInt(element[1]);
+                var y1 = parseInt(element[2]);
+                var x2 = parseInt(element[3]);
+                var y2 = parseInt(element[4]);
+                if (x1 < x2 && y1 < y2) {
+                    x1 = element[1];
+                    y1 = element[2];
+                    x2 = (parseInt(element[3]) - parseInt(element[1]));
+                    y2 = (parseInt(element[4]) - parseInt(element[2]));
+                }
+                else if (x1 > x2 && y1 > y2) {
+                    x1 = element[3];
+                    y1 = element[4];
+                    x2 = (parseInt(element[1]) - parseInt(element[3]));
+                    y2 = (parseInt(element[2]) - parseInt(element[4]));
+                }
+                else if (x1 < x2 && y1 > y2) {
+                    x1 = element[1];
+                    y1 = element[4];
+                    x2 = (parseInt(element[3]) - parseInt(element[1]));
+                    y2 = (parseInt(element[2]) - parseInt(element[4]));
+                }
+                else if (x1 > x2 && y1 < y2) {
+                    x1 = element[3];
+                    y1 = element[2];
+                    x2 = (parseInt(element[1]) - parseInt(element[3]));
+                    y2 = (parseInt(element[4]) - parseInt(element[2]));
+                } else if (x1 == x2 && y1 == y2) {
+                    x1 = element[3];
+                    y1 = element[2];
+                    x2 = (parseInt(element[1]) - parseInt(element[3]));
+                    y2 = (parseInt(element[4]) - parseInt(element[2]));
+                }
+
+
+
+                document.getElementById("view").innerHTML = "<div id='view"
+                    + element[0] +
+                    "' style='border: solid; left: " + x1 + //x(1)
+                    "px; top: " + y1 + //y(1)
+                    "px; width: " + x2 +  //x(2)
+                    "px; height: " + y2 + //y(2)
+                    "px; position: absolute;'></div>" + c;
+            });
+        }
     }
 
     function returnPointForm(areaCarre) {
