@@ -286,6 +286,12 @@
                 document.getElementById("afficher").innerHTML = "Cacher";
             }
             viewPos(e);
+            if (document.getElementById("graviter").innerHTML == "Fixe") {
+                document.getElementById("graviter").innerHTML = "Graviter";
+            } else {
+                document.getElementById("graviter").innerHTML = "Fixe";
+            }
+            graviter(e);
         }
     }
 
@@ -422,9 +428,9 @@
                 var x2 = parseInt(element[3]);
                 var y2 = parseInt(element[4]);
                 if (y1 == areaCarre.getCoordonnees()[1].getY()) {
-                    ok = false;
-                } else {
-                    // ok = true;
+                    if (x1 < areaCarre.getCoordonnees()[1].getX() && x2 > areaCarre.getCoordonnees()[1].getX() || x1 < areaCarre.getCoordonnees()[0].getX() && x2 > areaCarre.getCoordonnees()[0].getX()) {
+                            ok = false;
+                    }
                 }
             });
             if ((parseInt(areaCarre.getCoordonnees()[0].getY()) < 450 || parseInt(areaCarre.getCoordonnees()[1].getY()) < 500) && ok) {
