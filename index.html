@@ -50,7 +50,7 @@
                         <div class="col-12">
                             <!--  flèche -->
                             <div class="row justify-content-center">
-                                <button class="btn col-2">
+                                <button onmousedown="topPos(event)" onmouseup="topPos(event)" class="btn col-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" class="feather feather-arrow-up">
@@ -61,7 +61,7 @@
                             </div>
                             <div class="col-12">
                                 <div class="row justify-content-between">
-                                    <button class="btn col-2">
+                                    <button onmousedown="leftPos(event)" onmouseup="leftPos(event)" class="btn col-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -70,7 +70,7 @@
                                             <polyline points="12 19 5 12 12 5"></polyline>
                                         </svg>
                                     </button>
-                                    <button class="btn col-2">
+                                    <button onmousedown="rightPos(event)" onmouseup="rightPos(event)" class="btn col-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -82,7 +82,7 @@
                                 </div>
                             </div>
                             <div class="row justify-content-center">
-                                <button class="btn col-2">
+                                <button onmousedown="botPos(event)" onmouseup="botPos(event)" class="btn col-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" class="feather feather-arrow-down">
@@ -128,9 +128,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-2">
-                <button type="submit" id="afficher" class="btn btn-primary" name="login-form-submit"
+            <div class="col-12">
+                <button type="submit" id="afficher" class="col-1 btn btn-primary" name="login-form-submit"
                     onclick="viewPos(event)">Afficher</button>
+                <button type="submit" id="graviter" class="col-1 btn btn-primary" name="login-form-submit"
+                    onclick="graviter(event)">Graviter</button>
             </div>
             <!-- </div> -->
         </div>
@@ -174,11 +176,15 @@
     class AreaCarre {
         id;
         typeAire;
+        action;
         tblObjetPoint;
-        constructor(id, typeAire, tblObjetPoint) {
+        gravity;
+        constructor(id, typeAire, action, tblObjetPoint) {
             this.id = id;
             this.typeAire = typeAire;
+            this.action = action;
             this.tblObjetPoint = tblObjetPoint;
+            this.gravity = 100;
         }
         getCoordonnees() {
             return this.tblObjetPoint;
@@ -191,6 +197,18 @@
         }
         getId() {
             return this.id;
+        }
+        getAction() {
+            return this.action;
+        }
+        setAction(action) {
+            this.action = action;
+        }
+        getGravity() {
+            return this.gravity;
+        }
+        setGravity(gravity) {
+            this.gravity = gravity;
         }
     }
     class Point {
@@ -221,6 +239,10 @@
     }
 
     var map = new Map("img/Krusty_Le_Clown.webp", 'map de Krusty Le Clown', []);// map créé en dur
+    var left = false;
+    var toppom = false;
+    var bottom = false;
+    var right = false;
 
 
     $(document).ready(function () {
@@ -251,14 +273,19 @@
                 point1,
                 point2
             ];
-            var areaCarre = new AreaCarre(formData.get('id'), formData.get('type'), tblPoint);
+            var areaCarre = new AreaCarre(formData.get('id'), formData.get('type'), formData.get('action'), tblPoint);
             map.addElementArrayAreaCarre(areaCarre);
             var parsed = parseInt(document.getElementById("id").value);
             // document.getElementById("id").value = parsed + 1;
             printPos(areaCarre);
             returnPointForm(areaCarre);
             console.log(map.setTblObjetAreaCarre());
-
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
         }
     }
 
@@ -277,18 +304,28 @@
 
     function update(e) {
         e.preventDefault();
-        areaCarre = map.getAreaCarreById(document.getElementById("id").value);
-        areaCarre.getCoordonnees()[0].setX(document.getElementById("x1").value);
-        areaCarre.getCoordonnees()[0].setY(document.getElementById("y1").value);
-        areaCarre.getCoordonnees()[1].setX(document.getElementById("x2").value);
-        areaCarre.getCoordonnees()[1].setY(document.getElementById("y2").value);
-        printPos(areaCarre);
-        if (document.getElementById("afficher").innerHTML == "Cacher") {
-            document.getElementById("afficher").innerHTML = "Afficher";
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == document.getElementById("id").value) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+            areaCarre.getCoordonnees()[0].setX(document.getElementById("x1").value);
+            areaCarre.getCoordonnees()[0].setY(document.getElementById("y1").value);
+            areaCarre.getCoordonnees()[1].setX(document.getElementById("x2").value);
+            areaCarre.getCoordonnees()[1].setY(document.getElementById("y2").value);
+            printPos(areaCarre);
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
         } else {
-            document.getElementById("afficher").innerHTML = "Cacher";
+            alert("id introuvable !");
         }
-        viewPos(e);
     }
 
     function viewPos(e) {
@@ -308,7 +345,6 @@
                 });
                 total.push(cor);
             });
-            console.log(total);
             total.forEach(element => {
                 var c = document.getElementById("view").innerHTML;
                 var x1 = parseInt(element[1]);
@@ -347,14 +383,277 @@
 
 
 
-                document.getElementById("view").innerHTML = "<div id='view"
-                    + element[0] +
-                    "' style='border: solid; left: " + x1 + //x(1)
+                document.getElementById("view").innerHTML = "<button class='view' onclick='selectElement(" + element[0] + ")' style='border: solid; left: " + x1 + //x(1)
                     "px; top: " + y1 + //y(1)
                     "px; width: " + x2 +  //x(2)
                     "px; height: " + y2 + //y(2)
-                    "px; position: absolute;'></div>" + c;
+                    "px; position: absolute;'></button>" + c;
             });
+        }
+    }
+    function graviter(e) {
+        if (document.getElementById("graviter").innerHTML == "Fixe") {
+            document.getElementById("graviter").innerHTML = "Graviter";
+        } else {
+            document.getElementById("graviter").innerHTML = "Fixe";
+            lunchGraviter(e);
+        }
+    }
+
+    async function lunchGraviter(e) {
+        areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+        if (document.getElementById("graviter").innerHTML == "Fixe") {
+            var total = [];
+            var ok = true;
+            map.setTblObjetAreaCarre().forEach(element => {
+                var cor = [];
+                if (element != areaCarre) {
+                    cor.push(element.getId());
+                    element.getCoordonnees().forEach(elementNext => {
+                        cor.push(elementNext.getX());
+                        cor.push(elementNext.getY());
+                    });
+                    total.push(cor);
+                }
+            });
+            total.forEach(element => {
+                var x1 = parseInt(element[1]);
+                var y1 = parseInt(element[2]);
+                var x2 = parseInt(element[3]);
+                var y2 = parseInt(element[4]);
+                if (y1 == areaCarre.getCoordonnees()[1].getY()) {
+                    ok = false;
+                } else {
+                    // ok = true;
+                }
+            });
+            if ((parseInt(areaCarre.getCoordonnees()[0].getY()) < 450 || parseInt(areaCarre.getCoordonnees()[1].getY()) < 500) && ok) {
+                areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value));
+                areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value) + 1);
+                areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value));
+                areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value) + 1);
+                document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
+                document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
+                document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
+                document.getElementById("y2").value = areaCarre.getCoordonnees()[1].getY();
+                printPos(areaCarre);
+                if (document.getElementById("afficher").innerHTML == "Cacher") {
+                    document.getElementById("afficher").innerHTML = "Afficher";
+                } else {
+                    document.getElementById("afficher").innerHTML = "Cacher";
+                }
+                viewPos(e);
+                areaCarre.setGravity(parseInt(areaCarre.getGravity()) - parseInt(Math.log(parseInt(areaCarre.getGravity()) * 2)));
+                console.log(areaCarre.getGravity());
+            }
+        }
+        else {
+            areaCarre.setGravity(100);
+        }
+        setTimeout(() => lunchGraviter(e), areaCarre.getGravity());
+    }
+
+    function leftPos(e) {
+        e.preventDefault();
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == document.getElementById("id").value) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            if (left) {
+                left = false;
+            } else {
+                left = true;
+                leftLunch(e);
+            }
+        } else {
+            alert("id introuvable !");
+            left = false;
+            return;
+        }
+    }
+    function leftLunch(e) {
+        if (left) {
+            areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+            areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value) - 1);
+            areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value));
+            areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value) - 1);
+            areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value));
+
+            document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
+            document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
+            document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
+            document.getElementById("y2").value = areaCarre.getCoordonnees()[1].getY();
+
+            printPos(areaCarre);
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
+            setTimeout(() => leftLunch(e), 10);
+        } else {
+            return;
+        }
+    }
+    function topPos(e) {
+        e.preventDefault();
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == document.getElementById("id").value) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            if (toppom) {
+                toppom = false;
+            } else {
+                toppom = true;
+                topLunch(e);
+            }
+        } else {
+            alert("id introuvable !");
+            toppom = false;
+            return;
+        }
+    }
+    function topLunch(e) {
+        if (toppom) {
+            areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+            areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value));
+            areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value) - 1);
+            areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value));
+            areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value) - 1);
+
+            document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
+            document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
+            document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
+            document.getElementById("y2").value = areaCarre.getCoordonnees()[1].getY();
+
+            printPos(areaCarre);
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
+            setTimeout(() => topLunch(e), 10);
+        } else {
+            return;
+        }
+    }
+    function botPos(e) {
+        e.preventDefault();
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == document.getElementById("id").value) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            if (bottom) {
+                bottom = false;
+            } else {
+                bottom = true;
+                botLunch(e);
+            }
+        } else {
+            alert("id introuvable !");
+            bottom = false;
+            return;
+        }
+    }
+    function botLunch(e) {
+        if (bottom) {
+            areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+            areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value));
+            areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value) + 1);
+            areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value));
+            areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value) + 1);
+
+            document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
+            document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
+            document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
+            document.getElementById("y2").value = areaCarre.getCoordonnees()[1].getY();
+
+            printPos(areaCarre);
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
+            setTimeout(() => botLunch(e), 10);
+        } else {
+            return;
+        }
+    }
+    function rightPos(e) {
+        e.preventDefault();
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == document.getElementById("id").value) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            if (right) {
+                right = false;
+            } else {
+                right = true;
+                rightLunch(e);
+            }
+        } else {
+            alert("id introuvable !");
+            right = false;
+            return;
+        }
+    }
+    function rightLunch(e) {
+        if (right) {
+            areaCarre = map.getAreaCarreById(document.getElementById("id").value);
+            areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value) + 1);
+            areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value));
+            areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value) + 1);
+            areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value));
+
+            document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
+            document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
+            document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
+            document.getElementById("y2").value = areaCarre.getCoordonnees()[1].getY();
+
+            printPos(areaCarre);
+            if (document.getElementById("afficher").innerHTML == "Cacher") {
+                document.getElementById("afficher").innerHTML = "Afficher";
+            } else {
+                document.getElementById("afficher").innerHTML = "Cacher";
+            }
+            viewPos(e);
+            setTimeout(() => rightLunch(e), 10);
+        } else {
+            return;
+        }
+    }
+
+    function selectElement(id) {
+        pos = null;
+        map.setTblObjetAreaCarre().forEach(element => {
+            if (element.id == id) {
+                pos = element;
+            }
+        });
+        if (pos != null) {
+            document.getElementById("id").value = pos.getId();
+            document.getElementById("action").value = pos.getAction();
+            document.getElementById("x1").value = pos.getCoordonnees()[0].getX();
+            document.getElementById("y1").value = pos.getCoordonnees()[0].getY();
+            document.getElementById("x2").value = pos.getCoordonnees()[1].getX();
+            document.getElementById("y2").value = pos.getCoordonnees()[1].getY();
+        } else {
+            alert("élément introuvable !");
         }
     }
 
