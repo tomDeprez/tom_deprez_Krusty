@@ -179,12 +179,14 @@
         action;
         tblObjetPoint;
         gravity;
+        vitesse;
         constructor(id, typeAire, action, tblObjetPoint) {
             this.id = id;
             this.typeAire = typeAire;
             this.action = action;
             this.tblObjetPoint = tblObjetPoint;
-            this.gravity = 100;
+            this.gravity = 0.1;
+            this.vitesse = 20;
         }
         getCoordonnees() {
             return this.tblObjetPoint;
@@ -209,6 +211,12 @@
         }
         setGravity(gravity) {
             this.gravity = gravity;
+        }
+        getVitesse() {
+            return this.vitesse;
+        }
+        setVitesse(vitesse) {
+            this.vitesse = vitesse;
         }
     }
     class Point {
@@ -429,15 +437,24 @@
                 var y2 = parseInt(element[4]);
                 if (y1 == areaCarre.getCoordonnees()[1].getY()) {
                     if (x1 < areaCarre.getCoordonnees()[1].getX() && x2 > areaCarre.getCoordonnees()[1].getX() || x1 < areaCarre.getCoordonnees()[0].getX() && x2 > areaCarre.getCoordonnees()[0].getX()) {
-                            ok = false;
+                        ok = false;
                     }
                 }
             });
+            if (!ok) {
+                areaCarre.setGravity(0.1);
+                areaCarre.setVitesse(20);
+            }
             if ((parseInt(areaCarre.getCoordonnees()[0].getY()) < 450 || parseInt(areaCarre.getCoordonnees()[1].getY()) < 500) && ok) {
+                areaCarre.setGravity(parseFloat(areaCarre.getGravity()) + parseFloat(Math.log(parseFloat(areaCarre.getVitesse()))));
+
+                areaCarre.setVitesse(parseInt(areaCarre.getGravity()) - (parseInt(Math.log(parseInt(areaCarre.getVitesse()))) / 10));
+
+                console.log(parseInt(Math.log(areaCarre.getVitesse())));
                 areaCarre.getCoordonnees()[0].setX(parseInt(document.getElementById("x1").value));
-                areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value) + 1);
+                areaCarre.getCoordonnees()[0].setY(parseInt(document.getElementById("y1").value) + parseInt(parseInt(Math.log(areaCarre.getVitesse())) / 3));
                 areaCarre.getCoordonnees()[1].setX(parseInt(document.getElementById("x2").value));
-                areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value) + 1);
+                areaCarre.getCoordonnees()[1].setY(parseInt(document.getElementById("y2").value) + parseInt(parseInt(Math.log(areaCarre.getVitesse())) / 3));
                 document.getElementById("x1").value = areaCarre.getCoordonnees()[0].getX();
                 document.getElementById("y1").value = areaCarre.getCoordonnees()[0].getY();
                 document.getElementById("x2").value = areaCarre.getCoordonnees()[1].getX();
@@ -449,14 +466,14 @@
                     document.getElementById("afficher").innerHTML = "Cacher";
                 }
                 viewPos(e);
-                areaCarre.setGravity(parseInt(areaCarre.getGravity()) - parseInt(Math.log(parseInt(areaCarre.getGravity()) * 2)));
-                console.log(areaCarre.getGravity());
+                // console.log(areaCarre.getGravity());
             }
         }
         else {
-            areaCarre.setGravity(100);
+            areaCarre.setGravity(0.1);
+            areaCarre.setVitesse(20);
         }
-        setTimeout(() => lunchGraviter(e), areaCarre.getGravity());
+        setTimeout(() => lunchGraviter(e), 0);
     }
 
     function leftPos(e) {
