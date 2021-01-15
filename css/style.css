@@ -9,27 +9,6 @@
 img {
     border: solid;
 }
-
-/* area:link, area:hover, area:active, area:focus {
-    border: 5px #f00 solid;
-}
-
-#test {
-    position: absolute;
-    top: 0px;
-    left: 20%;
-} 
-
-#test2 {
-    position: absolute;
-    top: 10%;
-    left: 8.3%;
-    width: 42%;
-    height: 60%;
-    width: 240px;
-    height: 310px;
-}*/
-
 .view {
     background: #49494900;
 }
