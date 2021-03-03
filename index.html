@@ -15,29 +15,32 @@
     <div class="container">
         <div class="row">
             <!-- <div class="col-12"> -->
-            <div class="col-6">
-                <div id="view">
+            <div>
+                <div class="col-6">
+                    <div id="view">
 
+                    </div>
+                    <img src="img/Krusty_Le_Clown.webp" id="img" alt="Workplace" usemap="#workmap" width="400"
+                        height="500">
+                    <map name="workmap" id="mapArea">
+                    </map>
                 </div>
-                <img src="img/Krusty_Le_Clown.webp" id="img" alt="Workplace" usemap="#workmap" width="400" height="500">
-                <map name="workmap" id="mapArea">
-                </map>
             </div>
             <div class="form col-6">
-                <div class="container">
+                <div>
                     <form class="map" id="map" class="col-12">
                         <!--  formulaire ajouter une map -->
                         <div class="row">
-                            <label for="nom" class="col-6">Nom de la map</label>
-                            <input id="nom" class="col-6" type="text" name="nom" onchange="changeName();"
+                            <label for="nom" class="col-4">Nom de la map</label>
+                            <input id="nom" class="col-8" type="text" name="nom" onchange="changeName();"
                                 placeholder="Map" />
-                            <label for="id" class="col-6">Id de l'aire</label>
-                            <input id="id" class="col-6" type="text" name="id" onchange="updateView();" value="0"
+                            <label for="id" class="col-4">Id de l'aire</label>
+                            <input id="id" class="col-8" type="text" name="id" onchange="updateView();" value="0"
                                 placeholder="Id" />
-                            <label for="action" class="col-6">Action</label>
-                            <input id="action" onchange="addAction();" class="col-6" type="text" name="action" />
-                            <label for="type" class="col-6">Type d'aire</label>
-                            <select onchange="returnFormPoint();" name="type" class="col-6" id="type">
+                            <label for="action" class="col-4">Action</label>
+                            <input id="action" onchange="addAction();" class="col-8" type="text" name="action" />
+                            <label for="type" class="col-4">Type d'aire</label>
+                            <select onchange="returnFormPoint();" name="type" class="col-8" id="type">
                                 <option value="0">Carré</option>
                                 <option value="1">Cercle</option>
                                 <!-- <option value="2">Polygone</option> -->
